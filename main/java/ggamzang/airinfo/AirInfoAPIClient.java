@@ -14,6 +14,7 @@ import java.net.URLEncoder;
  * Created by user on 2016-01-04.
  */
 public class AirInfoAPIClient {
+        // Todo : fix error only coming 10 only even it's over 10
         final static String stationInfoUrlPre = "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName=";
         final static String stationInfoUrlPost = "&dataTerm=daily&pageNo=1&numOfRows=1&ServiceKey=uAmy02OcSWzBk2mjIbujDRJsMg4piiLiWNHooYln31zMqlisoxDwuJO9z3MsyvKHJnu3fXPZnRgm3nEDLND38A%3D%3D&ver=1.0";
         final static String jsonUrl = "&_returnType=json";

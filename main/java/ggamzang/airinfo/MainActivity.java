@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
                     mPrefEdit.putString(StaticData.PREF_STATION_KEY, mStationList.get(position).getStationName());
                     mPrefEdit.apply();
+
+                    if(mETUpdateTime != null)
+                        RestartAlarm(mETUpdateTime.getText().toString());
                 }
                 }
             });
@@ -93,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
                         AirInfoTask airInfoTask = new AirInfoTask();
                         if (airInfoTask != null)
                             airInfoTask.execute(mTVSelected.getText().toString());
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "지역을 입력하세요", Toast.LENGTH_LONG);
                     }
                 }
             });
@@ -222,8 +228,8 @@ public class MainActivity extends AppCompatActivity {
                     else
                         Log.e(StaticData.TAG, "unexpected grade:" + grade);
                     Toast.makeText(getApplicationContext(), "pm10Value:" + pm10Value + "pm10Grade:" + pm10Grade, Toast.LENGTH_LONG).show();
-                    if(mCBAutoUpdateEnable != null){
-                        mCBAutoUpdateEnable.setVisibility(View.VISIBLE);
+                    if(mLLUpdate != null){
+                        mLLUpdate.setVisibility(View.VISIBLE);
                     }
                 }
             }catch(JSONException e){

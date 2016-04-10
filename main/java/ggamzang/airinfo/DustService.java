@@ -22,6 +22,8 @@ import java.util.List;
 /**
  * Created by chansub.shin on 2016-01-08.
  */
+// TODO :   stop service before restart service
+//          not starting instantly
 public class DustService extends Service {
     private SharedPreferences mPref = null;
     private Thread mThread          = null;
@@ -51,6 +53,8 @@ public class DustService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         Log.i(StaticData.TAG, "DustService onStartCommand");
+        stationName = mPref.getString(StaticData.PREF_STATION_KEY, "");
+        Log.d(StaticData.TAG, stationName);
 
         if(stationName.length() > 0){
             // INFO : not able to http communication in main thread.
