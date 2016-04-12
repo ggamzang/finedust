@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_isAutoUpdate"
+        android:title="상태바 아이콘 사용"
+        android:defaultValue="false">
+    </CheckBoxPreference>
+    <ListPreference
+        android:dependency="pref_isAutoUpdate"
+        android:key="pref_syncConnectionType"
+        android:title="자동 새로고침"
+        android:dialogTitle="새로고침 시간 선택"
+        android:entries="@array/pref_updateHour_entries"
+        android:entryValues="@array/pref_updateHour_values"
+        android:defaultValue="@string/pref_updateHour_default" />
+</PreferenceScreen>

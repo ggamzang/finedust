@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_updateHour_entries">
+        <item>1 시간</item>
+        <item>2 시간</item>
+        <item>3 시간</item>
+        <item>4 시간</item>
+        <item>5 시간</item>
+    </string-array>
+    <string-array name="pref_updateHour_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

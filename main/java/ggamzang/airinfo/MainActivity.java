@@ -11,6 +11,8 @@ import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -54,9 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar myToolbar = (Toolbar)findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        myToolbar.setTitleTextColor(Color.WHITE);
+        myToolbar.inflateMenu(R.menu.toolbar_item);
 
-        //getSupportActionBar()
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
         mLVStationList = (ListView)findViewById(R.id.lvStationList);
         mETsearchStationName = (EditText)findViewById(R.id.etStationName);
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
 
                     mPrefEdit.putString(StaticData.PREF_STATION_KEY, mStationList.get(position).getStationName());
                     mPrefEdit.apply();
+
+                    if(mETUpdateTime != null)
+                        RestartAlarm(mETUpdateTime.getText().toString());
                 }
                 }
             });
@@ -93,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
                         AirInfoTask airInfoTask = new AirInfoTask();
                         if (airInfoTask != null)
                             airInfoTask.execute(mTVSelected.getText().toString());
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "지역을 입력하세요", Toast.LENGTH_LONG);
                     }
                 }
             });
@@ -192,6 +199,32 @@ public class MainActivity extends AppCompatActivity {
         am.cancel(alarmIntent);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_item, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_search: {
+                Toast.makeText(getApplicationContext(), "Search tapped", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.action_settings: {
+                Toast.makeText(getApplicationContext(), "Setting tapped", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public class AirInfoTask extends AsyncTask<String, Integer, Boolean>{
         String response;
         @Override
@@ -222,9 +255,9 @@ public class MainActivity extends AppCompatActivity {
                     else
                         Log.e(StaticData.TAG, "unexpected grade:" + grade);
                     Toast.makeText(getApplicationContext(), "pm10Value:" + pm10Value + "pm10Grade:" + pm10Grade, Toast.LENGTH_LONG).show();
-                    if(mCBAutoUpdateEnable != null){
-                        mCBAutoUpdateEnable.setVisibility(View.VISIBLE);
-                    }
+
+                    if(mTVSelected != null && mTVSelected.getText().length() > 0 && mLLUpdate != null)
+                        mLLUpdate.setVisibility(View.VISIBLE);
                 }
             }catch(JSONException e){
                 Log.e(StaticData.TAG, "Exception : " + e.toString());
