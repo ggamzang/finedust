@@ -6,8 +6,10 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.audiofx.BassBoost;
 import android.os.AsyncTask;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     EditText mETUpdateTime          = null;
     Button mBtnUpdateTimeApply      = null;
     LinearLayout mLLUpdate          = null;
+    TextView mTVtest = null;
 
     ArrayList<StationInfo> mStationList = null;
     ListView mListView = null;
@@ -66,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
         mBtnUpdateTimeApply = (Button)findViewById(R.id.btnUpdateApply);
         mETUpdateTime = (EditText)findViewById(R.id.etUpdateTime);
         mLLUpdate = (LinearLayout)findViewById(R.id.llupdate);
+        mTVtest = (TextView)findViewById(R.id.test);
+
+        if(mTVtest != null)
+        {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            Boolean isAuto = sharedPref.getBoolean(SettingsActivity.KEY_PREF_IS_AUTOUPDATE, false);
+            String time = sharedPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, "");
+            mTVtest.setText("isAuto:"+isAuto+", time:"+time);
+        }
 
         mPref = getSharedPreferences("myPref", Activity.MODE_PRIVATE);
         if(mPref != null)

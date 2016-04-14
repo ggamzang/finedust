@@ -7,7 +7,7 @@
     </CheckBoxPreference>
     <ListPreference
         android:dependency="pref_isAutoUpdate"
-        android:key="pref_syncConnectionType"
+        android:key="pref_updateHour"
         android:title="자동 새로고침"
         android:dialogTitle="새로고침 시간 선택"
         android:entries="@array/pref_updateHour_entries"
