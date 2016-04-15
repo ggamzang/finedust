@@ -264,11 +264,15 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             try {
                 JSONObject json = new JSONObject(response);
                 totalCount = json.getInt("totalCount");
+                // TODO : 10개 이상 정보가 한번에 안옴.. 확인 필요
                 JSONArray jsonArr = json.getJSONArray("list");
-                for(int i = 0 ; i < totalCount; i++){
+                if(jsonArr.length() <= 0) {
+                    Toast.makeText(getApplicationContext(), "해당 지역에 측정소 정보가 없습니다.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                for(int i = 0 ; i < jsonArr.length(); i++){
                     JSONObject jsonObj = jsonArr.getJSONObject(i);
 //                    strBdstationName.append(jsonObj.getString("stationName") + ",");
-
                     mStationList.add(new StationInfo(jsonObj.getString("stationName"), jsonObj.getString("addr")));
                 }
             }catch (JSONException e)
