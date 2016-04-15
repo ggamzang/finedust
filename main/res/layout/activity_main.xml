@@ -37,38 +37,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/test"/>
         <LinearLayout
-            android:id="@+id/llupdate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-            <CheckBox
-                android:id="@+id/cbAlarmEnable"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="자동업데이트 사용"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="업데이트 주기(시간)"/>
-                <EditText
-                    android:id="@+id/etUpdateTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="시간을 입력하세요"/>
-                <Button
-                    android:id="@+id/btnUpdateApply"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="적용"/>
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

@@ -40,10 +40,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     ListView mLVStationList         = null;
     EditText mETsearchStationName   = null;
     Button mBTNgetInfo              = null;
-    CheckBox mCBAutoUpdateEnable    = null;
-    EditText mETUpdateTime          = null;
-    Button mBtnUpdateTimeApply      = null;
-    LinearLayout mLLUpdate          = null;
     TextView mTVtest = null;
 
     ArrayList<StationInfo> mStationList = null;
@@ -65,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         mLVStationList = (ListView)findViewById(R.id.lvStationList);
         mETsearchStationName = (EditText)findViewById(R.id.etStationName);
         mBTNgetInfo = (Button)findViewById(R.id.btnGetInfo);
-        mCBAutoUpdateEnable = (CheckBox)findViewById(R.id.cbAlarmEnable);
-        mBtnUpdateTimeApply = (Button)findViewById(R.id.btnUpdateApply);
-        mETUpdateTime = (EditText)findViewById(R.id.etUpdateTime);
-        mLLUpdate = (LinearLayout)findViewById(R.id.llupdate);
         mTVtest = (TextView)findViewById(R.id.test);
 
         if(mTVtest != null)
@@ -79,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             mTVtest.setText("isAuto:"+isAuto+", time:"+time);
         }
 
-        mPref = getSharedPreferences("myPref", Activity.MODE_PRIVATE);
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("myPref", Activity.MODE_PRIVATE);
         if(mPref != null)
             mPrefEdit = mPref.edit();
 
@@ -87,16 +79,13 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             mLVStationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mStationList != null) {
-                    if (mTVSelected != null)
-                        mTVSelected.setText(mStationList.get(position).getStationName());
+                    if (mStationList != null) {
+                        if (mTVSelected != null)
+                            mTVSelected.setText(mStationList.get(position).getStationName());
 
-                    mPrefEdit.putString(StaticData.PREF_STATION_KEY, mStationList.get(position).getStationName());
-                    mPrefEdit.apply();
-
-                    if(mETUpdateTime != null)
-                        RestartAlarm(mETUpdateTime.getText().toString());
-                }
+                        mPrefEdit.putString(StaticData.PREF_STATION_KEY, mStationList.get(position).getStationName());
+                        mPrefEdit.apply();
+                    }
                 }
             });
         }
@@ -109,58 +98,12 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                         AirInfoTask airInfoTask = new AirInfoTask();
                         if (airInfoTask != null)
                             airInfoTask.execute(mTVSelected.getText().toString());
-                    }
-                    else{
+                    } else {
                         Toast.makeText(getApplicationContext(), "지역을 입력하세요", Toast.LENGTH_LONG);
                     }
                 }
             });
         }
-
-        if(mBtnUpdateTimeApply != null){
-            mBtnUpdateTimeApply.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                if( mPref != null && mETUpdateTime.getText().length() > 0){
-                    mPrefEdit.putString(StaticData.PREF_AUTOUPDATETIME_KEY, mETUpdateTime.getText().toString());
-                    mPrefEdit.apply();
-
-                    RestartAlarm(mETUpdateTime.getText().toString());
-                }
-                }
-            });
-        }
-
-        if(mETUpdateTime != null && mPref != null){
-            mETUpdateTime.setText(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
-        }
-
-        mCBAutoUpdateEnable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mETUpdateTime.getText().length() <= 0) {
-                    Toast.makeText(getApplicationContext(), "업데이트 시간을 입력하세요", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                if (isChecked == true) {
-                    RestartAlarm(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
-
-                    if (mPrefEdit != null) {
-                        mPrefEdit.putBoolean(StaticData.PREF_AUTOUPDATE_KEY, true);
-                        mPrefEdit.apply();
-                    }
-                } else {
-                    if (mPrefEdit != null) {
-                        mPrefEdit.putBoolean(StaticData.PREF_AUTOUPDATE_KEY, false);
-                        mPrefEdit.apply();
-                    }
-                    CancelAlarm();
-                    Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
-                    stopService(serviceIntent);
-                }
-            }
-        });
 
         Button btn = (Button)findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -181,11 +124,9 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                 mTVSelected.setText(mPref.getString(StaticData.PREF_STATION_KEY, ""));
             }
 
-            if(mTVSelected.getText().length() > 0 && mLLUpdate != null) {
-                mLLUpdate.setVisibility(View.VISIBLE);
+            if(mTVSelected.getText().length() > 0) {
                 Boolean autoUpdate = mPref.getBoolean(StaticData.PREF_AUTOUPDATE_KEY, false);
                 if(autoUpdate == true) {
-                    mCBAutoUpdateEnable.setChecked(true);
                     // TODO : check whether alarm is already set or not.
                     RestartAlarm(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
                 }
@@ -201,10 +142,9 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         am.cancel(alarmIntent);
 
-        Float updateCycleTime = Float.parseFloat(hour);
-        updateCycleTime *= (1000 * 60 * 60); // convert hour to mili sec
-        long firstTime = SystemClock.elapsedRealtime() + 1000;
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateCycleTime.longValue(), alarmIntent);
+        long updateHour = Long.getLong(hour);
+        long firstTime = SystemClock.elapsedRealtime();
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateHour * AlarmManager.INTERVAL_HOUR, alarmIntent);
     }
 
     private void CancelAlarm(){
@@ -244,9 +184,17 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         Log.e(StaticData.TAG, "MainActivity get notification for " + key);
         if(SettingsActivity.KEY_PREF_IS_AUTOUPDATE.equals(key)){
             Log.e(StaticData.TAG, "value:"+value);
+            if (value == "true") {
+                RestartAlarm(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
+            } else if(value == "false"){
+                CancelAlarm();
+                Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
+                stopService(serviceIntent);
+            }
         }
         else if(SettingsActivity.KEY_PREF_UPDATE_HOUR.equals(key)){
             Log.e(StaticData.TAG, "value:"+value);
+            RestartAlarm(value);
         }
     }
 
@@ -280,9 +228,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                     else
                         Log.e(StaticData.TAG, "unexpected grade:" + grade);
                     Toast.makeText(getApplicationContext(), "pm10Value:" + pm10Value + "pm10Grade:" + pm10Grade, Toast.LENGTH_LONG).show();
-
-                    if(mTVSelected != null && mTVSelected.getText().length() > 0 && mLLUpdate != null)
-                        mLLUpdate.setVisibility(View.VISIBLE);
                 }
             }catch(JSONException e){
                 Log.e(StaticData.TAG, "Exception : " + e.toString());
