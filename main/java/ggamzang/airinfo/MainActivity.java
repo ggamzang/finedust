@@ -92,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                     if(mTVSelected != null){
                         mTVSelected.setText(stationName);
                     }
-                    Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
-                    stopService(serviceIntent);
-                    RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
+                    if( mPref.getBoolean(SettingsActivity.KEY_PREF_IS_AUTOUPDATE, false) == true ) {
+                        Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
+                        stopService(serviceIntent);
+                        RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
+                    }
                 }
                 break;
             }
@@ -133,13 +135,11 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_search: {
-                Toast.makeText(getApplicationContext(), "Search tapped", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, SearchActivity.class);
                 startActivityForResult(intent, RESULT_SEARCH);
                 return true;
             }
             case R.id.action_settings: {
-                Toast.makeText(getApplicationContext(), "Setting tapped", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;

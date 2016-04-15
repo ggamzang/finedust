@@ -48,12 +48,10 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         if(key.equals(KEY_PREF_IS_AUTOUPDATE)){
             Boolean autoUpdate = sharedPreferences.getBoolean(key, false);
             value = autoUpdate.toString();
-            Toast.makeText(getApplicationContext(), "auto:"+autoUpdate, Toast.LENGTH_LONG).show();
         }
         else if(key.equals(KEY_PREF_UPDATE_HOUR)){
             String hour = sharedPreferences.getString(key, "");
             value = hour;
-            Toast.makeText(getApplicationContext(), "hour:"+hour, Toast.LENGTH_LONG).show();
         }
         AirInfoEventManager.getInstance().notifyPreferenceChanged(key, value);
     }
