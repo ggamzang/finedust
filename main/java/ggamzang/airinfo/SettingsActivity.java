@@ -8,7 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {// PreferenceActivity 쓰면 Crash 발생
+interface AirInfoSharedPreferenceChangeListener{
+    public void onAirInfoSharedPreferenceChanged(String key, String value);
+}
+// NOTE : PreferenceActivity 쓰면 Crash 발생
+public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     public static final String KEY_PREF_IS_AUTOUPDATE = "pref_isAutoUpdate";
     public static final String KEY_PREF_UPDATE_HOUR = "pref_updateHour";
@@ -40,14 +44,18 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        String value = "error";
         if(key.equals(KEY_PREF_IS_AUTOUPDATE)){
             Boolean autoUpdate = sharedPreferences.getBoolean(key, false);
+            value = autoUpdate.toString();
             Toast.makeText(getApplicationContext(), "auto:"+autoUpdate, Toast.LENGTH_LONG).show();
         }
         else if(key.equals(KEY_PREF_UPDATE_HOUR)){
             String hour = sharedPreferences.getString(key, "");
+            value = hour;
             Toast.makeText(getApplicationContext(), "hour:"+hour, Toast.LENGTH_LONG).show();
         }
+        AirInfoEventManager.getInstance().notifyPreferenceChanged(key, value);
     }
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -57,6 +65,4 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             addPreferencesFromResource(R.xml.preferences);
         }
     }
-
-
 }

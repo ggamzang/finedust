@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     TextView mTVSelected            = null;
     ListView mLVStationList         = null;
     EditText mETsearchStationName   = null;
@@ -191,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+        AirInfoEventManager.getInstance().addPreferenceListener(this);
     }
 
     private void RestartAlarm(String hour){
@@ -234,6 +236,17 @@ public class MainActivity extends AppCompatActivity {
             }
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onAirInfoSharedPreferenceChanged(String key, String value) {
+        Log.e(StaticData.TAG, "MainActivity get notification for " + key);
+        if(SettingsActivity.KEY_PREF_IS_AUTOUPDATE.equals(key)){
+            Log.e(StaticData.TAG, "value:"+value);
+        }
+        else if(SettingsActivity.KEY_PREF_UPDATE_HOUR.equals(key)){
+            Log.e(StaticData.TAG, "value:"+value);
         }
     }
 
