@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AirInfo</string>
+    <string name="app_name">미세먼지</string>
     <string name="settings">settings</string>
     <string name="pref_updateHour_default">1</string>
     <string name="title_activity_search">SearchActivity</string>

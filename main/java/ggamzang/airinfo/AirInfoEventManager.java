@@ -5,7 +5,8 @@ import java.util.ArrayList;
 /**
  * Created by 미진앤찬섭 on 2016-04-15.
  */
-public class AirInfoEventManager {
+
+public class AirInfoEventManager{
     private ArrayList<AirInfoSharedPreferenceChangeListener> mPreferenceObserver = null;
     private static AirInfoEventManager mInstance = null;
 
@@ -33,5 +34,4 @@ public class AirInfoEventManager {
             }
         }
     }
-
 }

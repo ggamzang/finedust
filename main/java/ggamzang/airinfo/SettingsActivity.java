@@ -9,9 +9,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 interface AirInfoSharedPreferenceChangeListener{
-    public void onAirInfoSharedPreferenceChanged(String key, String value);
+    void onAirInfoSharedPreferenceChanged(String key, String value);
 }
-// NOTE : PreferenceActivity 쓰면 Crash 발생
+// NOTE : PreferenceActivity 상속받으면 Crash 발생
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     public static final String KEY_PREF_IS_AUTOUPDATE = "pref_isAutoUpdate";

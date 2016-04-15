@@ -12,6 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:titleTextColor="#fff"
+        app:title="미세먼지 알림"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
@@ -32,30 +33,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="정보받기"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/test"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <EditText
-                android:id="@+id/etStationName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="지역을 입력하세요"/>
-            <Button
-                android:id="@+id/btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="검색"/>
-        </LinearLayout>
-        <ListView
-            android:id="@+id/lvStationList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-        </ListView>
     </LinearLayout>
 </LinearLayout>

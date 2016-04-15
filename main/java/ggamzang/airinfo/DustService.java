@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -33,7 +34,7 @@ public class DustService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(StaticData.TAG, "DustService Created");
-        mPref = getSharedPreferences("myPref", 0);
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);
         stationName = mPref.getString(StaticData.PREF_STATION_KEY, "");
         Log.d(StaticData.TAG, stationName);
 

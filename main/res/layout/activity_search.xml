@@ -12,6 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:titleTextColor="#fff"
+        app:title="지역 검색"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
@@ -23,9 +24,25 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="도시 추가 화면"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/etStationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="지역명을 입력하세요"
+                />
+            <Button
+                android:id="@+id/btnSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="검색"/>
+        </LinearLayout>
+        <ListView
+            android:id="@+id/lvStationList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ListView>
     </LinearLayout>
 </LinearLayout>

@@ -36,18 +36,13 @@ import java.util.ArrayList;
 import android.support.v7.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
-    TextView mTVSelected            = null;
-    ListView mLVStationList         = null;
-    EditText mETsearchStationName   = null;
-    Button mBTNgetInfo              = null;
-    TextView mTVtest = null;
+    private TextView mTVSelected            = null;
+    private Button mBTNgetInfo              = null;
 
-    ArrayList<StationInfo> mStationList = null;
-    ListView mListView = null;
-    StationListAdapter mAdapter = null;
+    private SharedPreferences mPref = null;
 
-    SharedPreferences mPref = null;
-    SharedPreferences.Editor mPrefEdit= null;
+    private static final int RESULT_SEARCH  =   1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,36 +53,12 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         myToolbar.inflateMenu(R.menu.toolbar_item);
 
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
-        mLVStationList = (ListView)findViewById(R.id.lvStationList);
-        mETsearchStationName = (EditText)findViewById(R.id.etStationName);
         mBTNgetInfo = (Button)findViewById(R.id.btnGetInfo);
-        mTVtest = (TextView)findViewById(R.id.test);
 
-        if(mTVtest != null)
-        {
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            Boolean isAuto = sharedPref.getBoolean(SettingsActivity.KEY_PREF_IS_AUTOUPDATE, false);
-            String time = sharedPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, "");
-            mTVtest.setText("isAuto:"+isAuto+", time:"+time);
-        }
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mPref = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("myPref", Activity.MODE_PRIVATE);
-        if(mPref != null)
-            mPrefEdit = mPref.edit();
-
-        if(mLVStationList != null) {
-            mLVStationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (mStationList != null) {
-                        if (mTVSelected != null)
-                            mTVSelected.setText(mStationList.get(position).getStationName());
-
-                        mPrefEdit.putString(StaticData.PREF_STATION_KEY, mStationList.get(position).getStationName());
-                        mPrefEdit.apply();
-                    }
-                }
-            });
+        if(mTVSelected != null){
+            mTVSelected.setText(mPref.getString(StaticData.PREF_STATION_KEY, ""));
         }
 
         if(mBTNgetInfo != null){
@@ -105,35 +76,34 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             });
         }
 
-        Button btn = (Button)findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if( mETsearchStationName.getText().length() > 0 ) {
-                    StationInfoTask stationTask = new StationInfoTask();
-                    if(stationTask != null)
-                        stationTask.execute(mETsearchStationName.getText().toString());
+        AirInfoEventManager.getInstance().addPreferenceListener(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode){
+            case RESULT_SEARCH:
+            {
+                if(resultCode == RESULT_OK)
+                {
+                    Bundle bundle = data.getExtras();
+                    String stationName = bundle.getString(SearchActivity.EXTRA_SEARCH_STATIONNAME);
+                    if(mTVSelected != null){
+                        mTVSelected.setText(stationName);
+                    }
+                    Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
+                    stopService(serviceIntent);
+                    RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
                 }
-            }
-        });
-
-        mStationList = new ArrayList<StationInfo>();
-
-        if(mTVSelected != null) {
-            if(mPref != null) {
-                mTVSelected.setText(mPref.getString(StaticData.PREF_STATION_KEY, ""));
-            }
-
-            if(mTVSelected.getText().length() > 0) {
-                Boolean autoUpdate = mPref.getBoolean(StaticData.PREF_AUTOUPDATE_KEY, false);
-                if(autoUpdate == true) {
-                    // TODO : check whether alarm is already set or not.
-                    RestartAlarm(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
-                }
+                break;
             }
         }
+    }
 
-        AirInfoEventManager.getInstance().addPreferenceListener(this);
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void RestartAlarm(String hour){
@@ -142,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         am.cancel(alarmIntent);
 
-        long updateHour = Long.getLong(hour);
+        long updateHour = (long)Integer.parseInt(hour);
         long firstTime = SystemClock.elapsedRealtime();
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateHour * AlarmManager.INTERVAL_HOUR, alarmIntent);
     }
@@ -165,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             case R.id.action_search: {
                 Toast.makeText(getApplicationContext(), "Search tapped", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, SearchActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, RESULT_SEARCH);
                 return true;
             }
             case R.id.action_settings: {
@@ -185,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         if(SettingsActivity.KEY_PREF_IS_AUTOUPDATE.equals(key)){
             Log.e(StaticData.TAG, "value:"+value);
             if (value == "true") {
-                RestartAlarm(mPref.getString(StaticData.PREF_AUTOUPDATETIME_KEY, StaticData.DEFAULT_UPDATEHOUR));
+                RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
             } else if(value == "false"){
                 CancelAlarm();
                 Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
@@ -241,72 +211,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         public AirInfoTask() {
             super();
-        }
-    }
-
-    public class StationInfoTask extends AsyncTask<String, Integer, Boolean> {
-        private String response;
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // show progress
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-
-            if( mStationList.isEmpty() == false )
-                mStationList.clear();
-
-//            StringBuilder strBdstationName = new StringBuilder();
-            int totalCount = 0;
-            try {
-                JSONObject json = new JSONObject(response);
-                totalCount = json.getInt("totalCount");
-                // TODO : 10개 이상 정보가 한번에 안옴.. 확인 필요
-                JSONArray jsonArr = json.getJSONArray("list");
-                if(jsonArr.length() <= 0) {
-                    Toast.makeText(getApplicationContext(), "해당 지역에 측정소 정보가 없습니다.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                for(int i = 0 ; i < jsonArr.length(); i++){
-                    JSONObject jsonObj = jsonArr.getJSONObject(i);
-//                    strBdstationName.append(jsonObj.getString("stationName") + ",");
-                    mStationList.add(new StationInfo(jsonObj.getString("stationName"), jsonObj.getString("addr")));
-                }
-            }catch (JSONException e)
-            {
-                Log.e(StaticData.TAG, "Exception : " + e.toString());
-            }
-
-            mAdapter = new StationListAdapter( getApplicationContext(), mStationList);
-            mListView = (ListView)findViewById(R.id.lvStationList);
-            mListView.setAdapter(mAdapter);
-        }
-
-        // called when calling publishProgress() in doInBackground
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onCancelled(Boolean aBoolean) {
-            super.onCancelled(aBoolean);
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            Log.d(StaticData.TAG, "Station search request for" + params[0]);
-            StationInfoAPIClient mAirClient = new StationInfoAPIClient();
-            response = mAirClient.getStationInfo(params[0]);
-            return null;
         }
     }
 }
