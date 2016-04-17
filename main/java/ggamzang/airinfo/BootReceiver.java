@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by chansub.shin on 2016-01-09.
@@ -26,7 +27,12 @@ public class BootReceiver extends BroadcastReceiver {
                 PendingIntent alarmIntent = PendingIntent.getService(context, 0, new Intent(context, DustService.class), 0);
 
                 long firstTime = SystemClock.elapsedRealtime();
-                long updateHour = (long)Integer.parseInt(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
+                long updateHour = 1;
+                try {
+                    updateHour = (long) Integer.parseInt(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
+                }catch (NumberFormatException e){
+                    Log.e(StaticData.TAG, e.toString());
+                }
 
                 am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateHour * AlarmManager.INTERVAL_HOUR, alarmIntent);
             }

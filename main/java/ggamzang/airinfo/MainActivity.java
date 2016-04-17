@@ -24,6 +24,8 @@ import org.json.JSONObject;
 
 import android.support.v7.widget.Toolbar;
 
+import java.text.NumberFormat;
+
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     private TextView mTVSelected            = null;
     private Button mBTNgetInfo              = null;
@@ -114,8 +116,13 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         PendingIntent alarmIntent = PendingIntent.getService(MainActivity.this, 0, new Intent(MainActivity.this, DustService.class), 0);
 
         am.cancel(alarmIntent);
+        long updateHour = 1;
+        try {
+            updateHour = (long) Integer.parseInt(hour);
+        } catch (NumberFormatException e){
+            Log.e(StaticData.TAG, e.toString());
+        }
 
-        long updateHour = (long)Integer.parseInt(hour);
         long firstTime = SystemClock.elapsedRealtime();
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateHour * AlarmManager.INTERVAL_HOUR, alarmIntent);
     }
@@ -229,7 +236,12 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         private String getAirGrade(String grade){
             final String[] gradeString = {"-", "좋음", "보통", "나쁨", "매우 나쁨"};
-            int parsedGrade = Integer.parseInt(grade);
+            int parsedGrade = 0;
+            try {
+                parsedGrade = Integer.parseInt(grade);
+            } catch (NumberFormatException e){
+                Log.e(StaticData.TAG, e.toString());
+            }
             if(0 < parsedGrade && parsedGrade < 5)
                 return gradeString[parsedGrade];
             else

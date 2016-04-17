@@ -80,7 +80,9 @@ public class DustService extends Service {
                                 Log.e(StaticData.TAG, "unexpected grade:" + grade);
                         }
                     }catch(JSONException e){
-                        Log.e(StaticData.TAG, "Exception : " + e.toString());
+                        Log.e(StaticData.TAG, e.toString());
+                    }catch(NumberFormatException e){
+                        Log.e(StaticData.TAG, e.toString());
                     }
 
                     Intent intent = new Intent(DustService.this, MainActivity.class);
