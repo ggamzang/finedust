@@ -1,12 +1,9 @@
 package ggamzang.airinfo;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.audiofx.BassBoost;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -16,13 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.Toolbar;
@@ -31,15 +22,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import android.support.v7.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     private TextView mTVSelected            = null;
     private Button mBTNgetInfo              = null;
+    private TextView mTVAirInfo             = null;
 
-    private SharedPreferences mPref = null;
+    private SharedPreferences mPref         = null;
 
     private static final int RESULT_SEARCH  =   1000;
 
@@ -54,11 +44,18 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
         mBTNgetInfo = (Button)findViewById(R.id.btnGetInfo);
+        mTVAirInfo  = (TextView)findViewById(R.id.tvAirInfo);
 
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(mTVSelected != null){
             mTVSelected.setText(mPref.getString(StaticData.PREF_STATION_KEY, ""));
+
+            if (mTVSelected.getText().length() > 0) {
+                AirInfoTask airInfoTask = new AirInfoTask();
+                if (airInfoTask != null)
+                    airInfoTask.execute(mTVSelected.getText().toString());
+            }
         }
 
         if(mBTNgetInfo != null){
@@ -75,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                 }
             });
         }
-
         AirInfoEventManager.getInstance().addPreferenceListener(this);
     }
 
@@ -106,6 +102,11 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     @Override
     protected void onResume() {
         super.onResume();
+        if (mTVSelected != null && mTVSelected.getText().length() > 0) {
+            AirInfoTask airInfoTask = new AirInfoTask();
+            if (airInfoTask != null)
+                airInfoTask.execute(mTVSelected.getText().toString());
+        }
     }
 
     private void RestartAlarm(String hour){
@@ -186,22 +187,53 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             try{
                 JSONObject json = new JSONObject(response);
                 JSONArray jsonArr = json.getJSONArray("list");
-                if(jsonArr != null) {
+                if (jsonArr != null) {
                     JSONObject airInfoObj = jsonArr.getJSONObject(0);
-                    String pm10Value = airInfoObj.getString(StaticData.PM10_VALUE_KEY);
-                    String pm10Grade = null;
-//                    String pm10Grade = airInfoObj.getString(StaticData.PM10_GRADE_KEY);
-                    final String[] gradeString = {"", "좋음", "보통", "나쁨", "매우 나쁨"};
-                    int grade = Integer.parseInt(airInfoObj.getString(StaticData.PM10_GRADE_KEY));
-                    if(0 < grade && grade < 5)
-                        pm10Grade = gradeString[grade];
-                    else
-                        Log.e(StaticData.TAG, "unexpected grade:" + grade);
-                    Toast.makeText(getApplicationContext(), "pm10Value:" + pm10Value + "pm10Grade:" + pm10Grade, Toast.LENGTH_LONG).show();
+
+                    String dateTime     = airInfoObj.getString(StaticData.AIR_DATATIME_KEY);
+
+                    String KHAI_Value   = airInfoObj.getString(StaticData.AIR_KHAI_VALUE_KEY);
+                    String KHAI_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_KHAI_GRADE_KEY));
+
+                    String pm10_Value   = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
+                    String pm10_Value24 = airInfoObj.getString(StaticData.AIR_PM10_VALUE24_KEY);
+                    String pm10_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
+
+                    String pm25_Value   = airInfoObj.getString(StaticData.AIR_PM25_VALUE_KEY);
+                    String pm25_Value24 = airInfoObj.getString(StaticData.AIR_PM25_VALUE24_KEY);
+                    String pm25_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_PM25_GRADE_KEY));
+
+                    String O3_Value     = airInfoObj.getString(StaticData.AIR_O3_VALUE_KEY);
+                    String O3_Grade     = getAirGrade(airInfoObj.getString(StaticData.AIR_O3_GRADE_KEY));
+
+                    String NO2_Value    = airInfoObj.getString(StaticData.AIR_NO2_VALUE_KEY);
+                    String NO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_NO2_GRADE_KEY));
+
+                    String SO2_Value    = airInfoObj.getString(StaticData.AIR_SO2_VALUE_KEY);
+                    String SO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_SO2_GRADE_KEY));
+
+                    String airInfo = "";
+                    airInfo += "측정시간 : " + dateTime + "\n";
+                    airInfo += "통합대기환경 : " + KHAI_Value + " - " + KHAI_Grade + "\n";
+                    airInfo += "미세먼지 : "   + pm10_Value + " ㎍/㎥(1H)," + pm10_Value24 + " ㎍/㎥(24H) - " + pm10_Grade + "\n";
+                    airInfo += "초미세먼지 : " + pm25_Value + " ㎍/㎥(1H)," + pm25_Value24 + " ㎍/㎥(24H) - " + pm25_Grade + "\n";
+                    airInfo += "오존 : "       + O3_Value + " ppm - " + O3_Grade + "\n";
+                    airInfo += "이산화질소 : " + NO2_Value + " ppm - " + NO2_Grade + "\n";
+                    airInfo += "아황산가스 : " + SO2_Value + " ppm - " + SO2_Grade + "\n";
+                    mTVAirInfo.setText(airInfo);
                 }
             }catch(JSONException e){
                 Log.e(StaticData.TAG, "Exception : " + e.toString());
             }
+        }
+
+        private String getAirGrade(String grade){
+            final String[] gradeString = {"-", "좋음", "보통", "나쁨", "매우 나쁨"};
+            int parsedGrade = Integer.parseInt(grade);
+            if(0 < parsedGrade && parsedGrade < 5)
+                return gradeString[parsedGrade];
+            else
+                return "-";
         }
 
         @Override

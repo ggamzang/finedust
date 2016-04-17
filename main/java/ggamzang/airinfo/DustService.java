@@ -12,13 +12,10 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * Created by chansub.shin on 2016-01-08.
@@ -75,8 +72,8 @@ public class DustService extends Service {
                         JSONArray jsonArr = json.getJSONArray("list");
                         if(jsonArr != null) {
                             JSONObject airInfoObj = jsonArr.getJSONObject(0);
-                            pm10Value = airInfoObj.getString(StaticData.PM10_VALUE_KEY);
-                            int grade = Integer.parseInt(airInfoObj.getString(StaticData.PM10_GRADE_KEY));
+                            pm10Value = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
+                            int grade = Integer.parseInt(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
                             if(0 < grade && grade < 5)
                                 pm10Grade = gradeString[grade];
                             else
