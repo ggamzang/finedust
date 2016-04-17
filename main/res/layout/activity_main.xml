@@ -28,11 +28,6 @@
             android:id="@+id/tvSelectedStationName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/btnGetInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="정보받기"/>
         <TextView
             android:id="@+id/tvAirInfo"
             android:layout_width="match_parent"

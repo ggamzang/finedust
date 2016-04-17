@@ -1,5 +1,9 @@
 package ggamzang.airinfo;
-
+/* TODO :   help 메뉴
+            GPS 위치 찾기
+            움직이는 위치에 따라 측정장소 변경
+            앱 아이콘 및 구름 이미지 추가( 등급에 따른 색 지정 )
+    */
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -28,7 +32,6 @@ import java.text.NumberFormat;
 
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     private TextView mTVSelected            = null;
-    private Button mBTNgetInfo              = null;
     private TextView mTVAirInfo             = null;
 
     private SharedPreferences mPref         = null;
@@ -45,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         myToolbar.inflateMenu(R.menu.toolbar_item);
 
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
-        mBTNgetInfo = (Button)findViewById(R.id.btnGetInfo);
         mTVAirInfo  = (TextView)findViewById(R.id.tvAirInfo);
 
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -60,20 +62,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             }
         }
 
-        if(mBTNgetInfo != null){
-            mBTNgetInfo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTVSelected.getText().length() > 0) {
-                        AirInfoTask airInfoTask = new AirInfoTask();
-                        if (airInfoTask != null)
-                            airInfoTask.execute(mTVSelected.getText().toString());
-                    } else {
-                        Toast.makeText(getApplicationContext(), "지역을 입력하세요", Toast.LENGTH_LONG);
-                    }
-                }
-            });
-        }
         AirInfoEventManager.getInstance().addPreferenceListener(this);
     }
 
@@ -93,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                     if( mPref.getBoolean(SettingsActivity.KEY_PREF_IS_AUTOUPDATE, false) == true ) {
                         Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
                         stopService(serviceIntent);
+
+                        startService(serviceIntent);
                         RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
                     }
                 }
@@ -123,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             Log.e(StaticData.TAG, e.toString());
         }
 
-        long firstTime = SystemClock.elapsedRealtime();
+        long firstTime = SystemClock.elapsedRealtime() + updateHour * AlarmManager.INTERVAL_HOUR;
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, updateHour * AlarmManager.INTERVAL_HOUR, alarmIntent);
     }
 
@@ -163,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         if(SettingsActivity.KEY_PREF_IS_AUTOUPDATE.equals(key)){
             Log.e(StaticData.TAG, "value:"+value);
             if (value == "true") {
+                Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
+                startService(serviceIntent);
+
                 RestartAlarm(mPref.getString(SettingsActivity.KEY_PREF_UPDATE_HOUR, StaticData.DEFAULT_UPDATEHOUR));
             } else if(value == "false"){
                 CancelAlarm();
@@ -189,8 +182,6 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-            getApplicationContext();
             try{
                 JSONObject json = new JSONObject(response);
                 JSONArray jsonArr = json.getJSONArray("list");
