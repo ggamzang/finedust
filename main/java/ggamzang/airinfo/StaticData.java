@@ -1,5 +1,7 @@
 package ggamzang.airinfo;
 
+import android.util.Log;
+
 /**
  * Created by user on 2016-01-05.
  */
@@ -38,4 +40,99 @@ public class StaticData {
     final static String AIR_SO2_GRADE_KEY   = "so2Grade";
 
     final static String DEFAULT_UPDATEHOUR  = "1";
+
+    final static String GRADE_TYPE_CAI      = "CAI";
+    final static String GRADE_TYPE_PM10     = "PM10";
+
+    // Naver Open API
+    final static String CLIENT_ID           = "ziEvZm7GRAvbW4njDkcP";
+    final static String CLIENT_SECRET       = "UaVDU99au7";
+
+    // Google
+    final static String GOOGLE_API_KEY      = "AIzaSyBpuAeVe2dWrFrSq8rOME1_CDH26LFTfw4";
+    final static String GOOGLE_REVERSE_GEOCODING_API_URL      = "https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s&language=ko";
+
+    static String GetGradeString(int value, String gradeType){
+        String grade = "";
+        switch(gradeType)
+        {
+            case GRADE_TYPE_CAI:
+            {
+                final String[] gradeString = {"", "좋음", "보통", "나쁨", "매우 나쁨"};
+                grade = gradeString[value];
+                break;
+            }
+            case GRADE_TYPE_PM10:
+            {
+                if(0 <= value && value <= 30)
+                {
+                    grade = "좋음";
+                }
+                else if(31 <= value && value <= 80)
+                {
+                    grade = "보통";
+                }
+                else if(81 <= value && value <= 150)
+                {
+                    grade = "나쁨";
+                }
+                else if(151 <= value)
+                {
+                    grade = "매우나쁨";
+                }
+                else
+                {
+                    grade = "-";
+                }
+                break;
+            }
+            default:
+            {
+                Log.d(TAG, "unexpected gradeType:"+gradeType);
+                break;
+            }
+        }
+        return grade;
+    }
+
+    static int getGradeImage(int value, String gradeType){
+        int imageID = 0;
+        switch(gradeType)
+        {
+            case GRADE_TYPE_CAI:
+            {
+                break;
+            }
+            case GRADE_TYPE_PM10:
+            {
+                if(0 <= value && value <= 30)
+                {
+                    imageID = R.drawable.blue;
+                }
+                else if(31 <= value && value <= 80)
+                {
+                    imageID = R.drawable.green;
+                }
+                else if(81 <= value && value <= 150)
+                {
+                    imageID = R.drawable.yellow;
+                }
+                else if(151 <= value)
+                {
+                    imageID = R.drawable.red;
+                }
+                else
+                {
+                    imageID = 0;
+                }
+                break;
+            }
+            default:
+            {
+                Log.d(TAG, "unexpected gradeType:"+gradeType);
+                break;
+            }
+        }
+        return imageID;
+    }
 }

@@ -1,13 +1,16 @@
 package ggamzang.airinfo;
 /* TODO :   help 메뉴
-            GPS 위치 찾기
-            움직이는 위치에 따라 측정장소 변경
-            앱 아이콘 및 구름 이미지 추가( 등급에 따른 색 지정 )
-    */
+        :   GPS 위치 찾기 - blocked
+        :   움직이는 위치에 따라 측정장소 변경 - x
+        :   앱 아이콘 및 구름 이미지 추가( 등급에 따른 색 지정 )
+*/
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -18,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.Toolbar;
@@ -25,6 +29,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import android.support.v7.widget.Toolbar;
 
@@ -33,7 +38,13 @@ import java.text.NumberFormat;
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     private TextView mTVSelected            = null;
     private TextView mTVAirInfo             = null;
-
+    private TextView mTVCIA                 = null;
+    private TextView mTVPM10                = null;
+    private TextView mTVO3                  = null;
+    private TextView mTVNO2                 = null;
+    private TextView mTVSO2                 = null;
+    /*private Button mBtnColor    = null;
+    private ImageView mIVColor  = null;*/
     private SharedPreferences mPref         = null;
 
     private static final int RESULT_SEARCH  =   1000;
@@ -49,6 +60,14 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
         mTVAirInfo  = (TextView)findViewById(R.id.tvAirInfo);
+        /*mBtnColor = (Button)findViewById(R.id.btnColor);
+        mIVColor = (ImageView)findViewById(R.id.ivColor);*/
+
+        mTVCIA = (TextView)findViewById(R.id.tvCIA);
+        mTVPM10 = (TextView)findViewById(R.id.tvPM10);
+        mTVO3 = (TextView)findViewById(R.id.tvO3);
+        mTVNO2 = (TextView)findViewById(R.id.tvNO2);
+        mTVSO2 = (TextView)findViewById(R.id.tvSO2);
 
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -62,6 +81,15 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             }
         }
 
+        /*mBtnColor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Drawable img = R.drawable.ic_wb_cloudy_black_48dp;
+                Drawable drb = (Drawable)getResources().getDrawable(R.drawable.ic_wb_cloudy_white_48dp);
+                drb.setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                mIVColor.setImageDrawable(drb);
+            }
+        });*/
         AirInfoEventManager.getInstance().addPreferenceListener(this);
     }
 
@@ -212,13 +240,13 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
                     String airInfo = "";
                     airInfo += "측정시간 : " + dateTime + "\n";
-                    airInfo += "통합대기환경 : " + KHAI_Value + " - " + KHAI_Grade + "\n";
-                    airInfo += "미세먼지 : "   + pm10_Value + " ㎍/㎥(1H)," + pm10_Value24 + " ㎍/㎥(24H) - " + pm10_Grade + "\n";
-                    airInfo += "초미세먼지 : " + pm25_Value + " ㎍/㎥(1H)," + pm25_Value24 + " ㎍/㎥(24H) - " + pm25_Grade + "\n";
-                    airInfo += "오존 : "       + O3_Value + " ppm - " + O3_Grade + "\n";
-                    airInfo += "이산화질소 : " + NO2_Value + " ppm - " + NO2_Grade + "\n";
-                    airInfo += "아황산가스 : " + SO2_Value + " ppm - " + SO2_Grade + "\n";
                     mTVAirInfo.setText(airInfo);
+
+                    mTVCIA.setText(KHAI_Value + " - " + KHAI_Grade);
+                    mTVPM10.setText(pm10_Value + "㎍/㎥(1H)" + pm10_Value24);
+                    mTVO3.setText(O3_Value + " ppm - " + O3_Grade);
+                    mTVNO2.setText(NO2_Value + " ppm - " + NO2_Grade);
+                    mTVSO2.setText(SO2_Value + " ppm - " + SO2_Grade);
                 }
             }catch(JSONException e){
                 Log.e(StaticData.TAG, "Exception : " + e.toString());

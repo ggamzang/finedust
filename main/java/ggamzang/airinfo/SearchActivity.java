@@ -1,10 +1,16 @@
 package ggamzang.airinfo;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,12 +28,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {// implements LocationListener {
 
     private EditText mETStationName = null;
-    private Button mBtnSearch = null;
+    private Button mBtnSearch       = null;
+    private Button mBtnGPS          = null;
     private ListView mLVStationList = null;
     private StationListAdapter mAdapter = null;
+    private GPSSettingsDialog mSettingsDialog = null;
 
     private ArrayList<StationInfo> mStationList = null;
 
@@ -58,6 +66,8 @@ public class SearchActivity extends AppCompatActivity {
         mETStationName = (EditText)findViewById(R.id.etStationName);
         mBtnSearch = (Button)findViewById(R.id.btnSearch);
         mLVStationList = (ListView)findViewById(R.id.lvStationList);
+        mBtnGPS         = (Button)findViewById(R.id.btnGPS);
+        mSettingsDialog = new GPSSettingsDialog(this);
 
         if(mBtnSearch != null){
             mBtnSearch.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +96,72 @@ public class SearchActivity extends AppCompatActivity {
                         setResult(RESULT_OK, intent);
                         finish();
                     }
+                }
+            });
+        }
+
+        if(mBtnGPS != null){
+            mBtnGPS.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                    boolean isGPSEnalbed = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+                    if(isGPSEnalbed == false){
+                        mSettingsDialog.show();
+                        return;
+                    }
+
+                    double latitude = 0;
+                    double longitude = 0;
+
+                    Location networkLocation = null;
+                    boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                    if(isNetworkEnabled) {
+                        networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if(networkLocation != null){
+                            Log.e(StaticData.TAG, "[NETWORK] 위도" + networkLocation.getLatitude() + ", 경도:" + networkLocation.getLongitude());
+                            latitude = networkLocation.getLatitude();
+                            longitude = networkLocation.getLongitude();
+                        }
+                        else{
+                            Log.e(StaticData.TAG, "[NETWORK] not able to get location object");
+                        }
+                    }
+
+                    Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if(gpsLocation != null) {
+                        Log.d(StaticData.TAG, "[GPS] 위도:" + gpsLocation.getLatitude() + ", 경도:" + gpsLocation.getLongitude());
+                        latitude = gpsLocation.getLatitude();
+                        longitude = gpsLocation.getLongitude();
+                    }
+                    else{
+                        Log.e(StaticData.TAG, "[GPS] not able to get location object");
+                    }
+
+                    ReverseGeocodingTask geoTask = new ReverseGeocodingTask();
+                    if(geoTask != null){
+                        geoTask.execute(Double.toString(latitude), Double.toString(longitude));
+                    }
+                }
+            });
+        }
+
+        if(mSettingsDialog != null){
+            mSettingsDialog.setTitle("위치 서비스 사용");
+            mSettingsDialog.setSettingsClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                    mSettingsDialog.cancel();
+                }
+            });
+
+            mSettingsDialog.setCancelClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSettingsDialog.cancel();
                 }
             });
         }
@@ -161,6 +237,33 @@ public class SearchActivity extends AppCompatActivity {
             Log.d(StaticData.TAG, "Station search request for" + params[0]);
             StationInfoAPIClient mAirClient = new StationInfoAPIClient();
             response = mAirClient.getStationInfo(params[0]);
+            return null;
+        }
+    }
+
+    /*
+    * TODO : GPS 로 근처 측정소 찾기
+    * 동네로 TM 좌표 가져옴( 근처 측정소 TM을 못가져옴 ;; )
+    * http://openapi.airkorea.or.kr/openapi/services/rest/MsrstnInfoInqireSvc/getTMStdrCrdnt?umdName=%EB%8F%99%ED%83%84&pageNo=1&numOfRows=10&ServiceKey=uAmy02OcSWzBk2mjIbujDRJsMg4piiLiWNHooYln31zMqlisoxDwuJO9z3MsyvKHJnu3fXPZnRgm3nEDLND38A%3D%3D
+    *
+    * TM좌표로 근처 측정소 찾기
+    * 동탄 ( 209794.232219, 409509.684878 )
+    * http://openapi.airkorea.or.kr/openapi/services/rest/MsrstnInfoInqireSvc/getNearbyMsrstnList?tmX=209794.232219&tmY=409509.684878&pageNo=1&numOfRows=10&ServiceKey=uAmy02OcSWzBk2mjIbujDRJsMg4piiLiWNHooYln31zMqlisoxDwuJO9z3MsyvKHJnu3fXPZnRgm3nEDLND38A%3D%3D
+    */
+    public class ReverseGeocodingTask extends AsyncTask<String, Integer, Boolean>{
+        private String response;
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            Toast.makeText(getApplicationContext(), "주소 : " + response, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Log.d(StaticData.TAG, "위도:"+params[0]+", 경도:"+params[1]);
+            ReverseGeocodingAPIClient mGeocodingClient = new ReverseGeocodingAPIClient();
+            response = mGeocodingClient.getAddress(params[0], params[1]);
             return null;
         }
     }

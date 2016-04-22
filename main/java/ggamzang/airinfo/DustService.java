@@ -64,20 +64,23 @@ public class DustService extends Service {
                     String response = mAirClient.getStationInfo(stationName);
                     Log.d(StaticData.TAG, "airInfo : " + response);
 
-                    String pm10Value = null;
-                    String pm10Grade = null;
-                    final String[] gradeString = {"", "좋음", "보통", "나쁨", "매우 나쁨"};
+                    String pm10Value = "-";
+                    String pm10Grade = "-";
+                    int imageID = 0;
                     try{
                         JSONObject json = new JSONObject(response);
                         JSONArray jsonArr = json.getJSONArray("list");
                         if(jsonArr != null) {
                             JSONObject airInfoObj = jsonArr.getJSONObject(0);
                             pm10Value = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
-                            int grade = Integer.parseInt(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
+                            int pm10Value_int = Integer.parseInt(pm10Value);
+                            pm10Grade = StaticData.GetGradeString(pm10Value_int, StaticData.GRADE_TYPE_PM10);
+                            imageID = StaticData.getGradeImage(pm10Value_int, StaticData.GRADE_TYPE_PM10);
+                            /*int grade = Integer.parseInt(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
                             if(0 < grade && grade < 5)
                                 pm10Grade = gradeString[grade];
                             else
-                                Log.e(StaticData.TAG, "unexpected grade:" + grade);
+                                Log.e(StaticData.TAG, "unexpected grade:" + grade);*/
                         }
                     }catch(JSONException e){
                         Log.e(StaticData.TAG, e.toString());
@@ -90,7 +93,7 @@ public class DustService extends Service {
                     Notification updatedNoti = new NotificationCompat.Builder(DustService.this)
                             .setContentTitle(stationName + " 미세먼지 정보")
                             .setContentText("미세먼지 : " + pm10Value + " ㎍/㎥ ( " + pm10Grade + " )")
-                            .setSmallIcon(R.drawable.cloud)
+                            .setSmallIcon(imageID)
                             .setContentIntent(pIntent)
                             .build();
 
