@@ -1,8 +1,7 @@
 package ggamzang.airinfo;
 /* TODO :   help 메뉴
-        :   GPS 위치 찾기 - blocked
         :   움직이는 위치에 따라 측정장소 변경 - x
-        :   앱 아이콘 및 구름 이미지 추가( 등급에 따른 색 지정 )
+        :   정보 받아올때 마다 Noti update
 */
 import android.app.AlarmManager;
 import android.app.PendingIntent;

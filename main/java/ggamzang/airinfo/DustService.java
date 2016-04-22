@@ -20,8 +20,7 @@ import org.json.JSONObject;
 /**
  * Created by chansub.shin on 2016-01-08.
  */
-// TODO :   stop service before restart service
-//          not starting instantly
+
 public class DustService extends Service {
     private SharedPreferences mPref = null;
     private Thread mThread          = null;
@@ -44,7 +43,7 @@ public class DustService extends Service {
                 .setContentIntent(pIntent)
                 .build();
 
-        startForeground(12345, noti);
+        startForeground(StaticData.NOTI_ID, noti);
     }
 
     @Override
@@ -83,8 +82,10 @@ public class DustService extends Service {
                                 Log.e(StaticData.TAG, "unexpected grade:" + grade);*/
                         }
                     }catch(JSONException e){
+                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
                         Log.e(StaticData.TAG, e.toString());
                     }catch(NumberFormatException e){
+                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
                         Log.e(StaticData.TAG, e.toString());
                     }
 
@@ -98,7 +99,7 @@ public class DustService extends Service {
                             .build();
 
                     NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    nm.notify(12345, updatedNoti);
+                    nm.notify(StaticData.NOTI_ID, updatedNoti);
                 }
             };
 

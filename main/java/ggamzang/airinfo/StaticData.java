@@ -52,6 +52,8 @@ public class StaticData {
     final static String GOOGLE_API_KEY      = "AIzaSyBpuAeVe2dWrFrSq8rOME1_CDH26LFTfw4";
     final static String GOOGLE_REVERSE_GEOCODING_API_URL      = "https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s&language=ko";
 
+    final static int NOTI_ID                = 720;
+
     static String GetGradeString(int value, String gradeType){
         String grade = "";
         switch(gradeType)
@@ -107,23 +109,23 @@ public class StaticData {
             {
                 if(0 <= value && value <= 30)
                 {
-                    imageID = R.drawable.blue;
+                    imageID = R.drawable.ic_cloud_good_36dp;
                 }
                 else if(31 <= value && value <= 80)
                 {
-                    imageID = R.drawable.green;
+                    imageID = R.drawable.ic_cloud_normal_36dp;
                 }
                 else if(81 <= value && value <= 150)
                 {
-                    imageID = R.drawable.yellow;
+                    imageID = R.drawable.ic_cloud_bad_36dp;
                 }
                 else if(151 <= value)
                 {
-                    imageID = R.drawable.red;
+                    imageID = R.drawable.ic_cloud_verybad_36dp;
                 }
                 else
                 {
-                    imageID = 0;
+                    imageID = R.drawable.ic_cloud_off_white_36dp;
                 }
                 break;
             }

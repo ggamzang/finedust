@@ -1,5 +1,8 @@
 package ggamzang.airinfo;
-
+/* TODO
+ * : GPS 구현
+ * : EditText 두줄 안되고, 엔터하면 검색
+ */
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
