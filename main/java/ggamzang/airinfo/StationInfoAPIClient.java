@@ -9,13 +9,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-
 /**
  * Created by user on 2016-01-04.
  */
 public class StationInfoAPIClient {
         final static String stationInfoUrlPre = "http://openapi.airkorea.or.kr/openapi/services/rest/MsrstnInfoInqireSvc/getMsrstnList?addr=";
-        final static String stationInfoUrlPost = "&pageNo=1&numOfRows=10&ServiceKey=uAmy02OcSWzBk2mjIbujDRJsMg4piiLiWNHooYln31zMqlisoxDwuJO9z3MsyvKHJnu3fXPZnRgm3nEDLND38A%3D%3D";
+        final static String stationInfoUrlPost = "&pageNo=1&numOfRows=100&ServiceKey=uAmy02OcSWzBk2mjIbujDRJsMg4piiLiWNHooYln31zMqlisoxDwuJO9z3MsyvKHJnu3fXPZnRgm3nEDLND38A%3D%3D";
         final static String jsonUrl = "&_returnType=json";
 
         public String getStationInfo(String addr){
