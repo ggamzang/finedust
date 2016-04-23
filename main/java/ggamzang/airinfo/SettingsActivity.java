@@ -1,6 +1,7 @@
 package ggamzang.airinfo;
 
 import android.content.SharedPreferences;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,9 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
     public static final String KEY_PREF_IS_AUTOUPDATE = "pref_isAutoUpdate";
     public static final String KEY_PREF_UPDATE_HOUR = "pref_updateHour";
+
+    protected static ListPreference listPref = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +53,17 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         super.onResume();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
-        Log.e(StaticData.TAG,"onREsume");
+
+        // listPref is set in onResume. not set in onCreate
+        if(listPref != null) {
+            String hour = sharedPref.getString(KEY_PREF_UPDATE_HOUR, "");
+            listPref.setSummary(hour + "시간");
+        }
+        else{
+            Log.e(StaticData.TAG, "listPref is null");
+        }
+
+        Log.e(StaticData.TAG,"onResume");
     }
 
     @Override
@@ -70,15 +84,21 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         else if(key.equals(KEY_PREF_UPDATE_HOUR)){
             String hour = sharedPreferences.getString(key, "");
             value = hour;
+            if(listPref != null) {
+                listPref.setSummary(hour + "시간");
+            }
         }
         AirInfoEventManager.getInstance().notifyPreferenceChanged(key, value);
     }
 
     public static class SettingsFragment extends PreferenceFragment {
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
+            Log.d(StaticData.TAG, "SettingsFragment - onCreate");
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+            listPref = (ListPreference)findPreference(KEY_PREF_UPDATE_HOUR);
         }
     }
 }

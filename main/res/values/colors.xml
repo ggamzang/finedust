@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <!--
+        Indigo : https://www.google.com/design/spec/style/color.html#color-color-palette
+    -->
+    <color name="colorPrimary">#3F51B5</color>          <!-- 500 -->
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorBackground">#E8EAF6</color>       <!-- 50 -->
+    <color name="colorBlockBackground">#C5CAE9</color>  <!-- 100 -->
+    <color name="colorOutline">#1A237E</color>          <!-- 900 -->
 </resources>
