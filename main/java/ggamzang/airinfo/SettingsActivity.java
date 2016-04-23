@@ -1,6 +1,7 @@
 package ggamzang.airinfo;
 
 import android.content.SharedPreferences;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -21,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     public static final String KEY_PREF_UPDATE_HOUR = "pref_updateHour";
 
     protected static ListPreference listPref = null;
+    protected static CheckBoxPreference checkPref = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,16 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             Log.e(StaticData.TAG, "listPref is null");
         }
 
+        if(checkPref != null){
+            String station = sharedPref.getString(StaticData.PREF_STATION_KEY, "");
+            if(station.length() > 0){
+                checkPref.setEnabled(true);
+            }
+            else{
+                checkPref.setEnabled(false);
+            }
+        }
+
         Log.e(StaticData.TAG,"onResume");
     }
 
@@ -88,6 +100,17 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
                 listPref.setSummary(hour + "시간");
             }
         }
+        else if(key.equals(StaticData.PREF_STATION_KEY)){
+            if(checkPref != null){
+                String station = sharedPreferences.getString(StaticData.PREF_STATION_KEY, "");
+                if(station.length() > 0){
+                    checkPref.setEnabled(true);
+                }
+                else{
+                    checkPref.setEnabled(false);
+                }
+            }
+        }
         AirInfoEventManager.getInstance().notifyPreferenceChanged(key, value);
     }
 
@@ -99,6 +122,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
             listPref = (ListPreference)findPreference(KEY_PREF_UPDATE_HOUR);
+            checkPref = (CheckBoxPreference)findPreference(KEY_PREF_IS_AUTOUPDATE);
         }
     }
 }
