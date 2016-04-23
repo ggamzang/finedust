@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.Toolbar;
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     private TextView mTVO3                  = null;
     private TextView mTVNO2                 = null;
     private TextView mTVSO2                 = null;
+
+    private LinearLayout mLLMain            = null;
+    private TextView mTVGuide                = null;
     /*private Button mBtnColor    = null;
     private ImageView mIVColor  = null;*/
     private SharedPreferences mPref         = null;
@@ -57,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         setSupportActionBar(myToolbar);
         myToolbar.inflateMenu(R.menu.toolbar_item);
 
+        mLLMain     = (LinearLayout)findViewById(R.id.llMain);
+        mTVGuide    = (TextView)findViewById(R.id.tvGuide);
         mTVSelected = (TextView)findViewById(R.id.tvSelectedStationName);
         mTVAirInfo  = (TextView)findViewById(R.id.tvAirInfo);
         /*mBtnColor = (Button)findViewById(R.id.btnColor);
@@ -74,9 +80,13 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
             mTVSelected.setText(mPref.getString(StaticData.PREF_STATION_KEY, ""));
 
             if (mTVSelected.getText().length() > 0) {
+                mLLMain.setVisibility(View.VISIBLE);
                 AirInfoTask airInfoTask = new AirInfoTask();
                 if (airInfoTask != null)
                     airInfoTask.execute(mTVSelected.getText().toString());
+            }
+            else{
+                mTVGuide.setVisibility(View.VISIBLE);
             }
         }
 
@@ -104,6 +114,14 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                     String stationName = bundle.getString(SearchActivity.EXTRA_SEARCH_STATIONNAME);
                     if(mTVSelected != null){
                         mTVSelected.setText(stationName);
+                        if (mTVSelected.getText().length() > 0) {
+                            mLLMain.setVisibility(View.VISIBLE);
+                            mTVGuide.setVisibility(View.GONE);
+                        }
+                        else{
+                            mLLMain.setVisibility(View.GONE);
+                            mTVGuide.setVisibility(View.VISIBLE);
+                        }
                     }
                     if( mPref.getBoolean(SettingsActivity.KEY_PREF_IS_AUTOUPDATE, false) == true ) {
                         Intent serviceIntent = new Intent(MainActivity.this, DustService.class);
