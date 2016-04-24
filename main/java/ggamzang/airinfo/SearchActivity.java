@@ -1,6 +1,6 @@
 package ggamzang.airinfo;
 /* TODO
- * : GPS 구현
+ * : GPS 구현 - TM좌표 변환해서 근거리 측정소 찾기
  * : EditText 두줄 안되고, 엔터하면 검색
  */
 import android.app.Dialog;

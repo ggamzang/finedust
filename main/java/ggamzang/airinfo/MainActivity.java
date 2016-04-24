@@ -2,6 +2,10 @@ package ggamzang.airinfo;
 /* TODO :   help 메뉴
         :   움직이는 위치에 따라 측정장소 변경 - x
         :   정보 받아올때 마다 Noti update
+        :   특정시간 절전 기능 추가
+        :   상태 안좋아졌을때 알림 추가( 좋음 > 보통 > 나쁨 > 매우나쁨 )
+        :   미세먼지 예보
+        :   미세먼지 history graph 추가
 */
 import android.app.AlarmManager;
 import android.app.PendingIntent;
