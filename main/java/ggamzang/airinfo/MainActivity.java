@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     private TextView mTVAirInfo             = null;
     private TextView mTVCIA                 = null;
     private TextView mTVPM10                = null;
+    private TextView mTVPM25                = null;
     private TextView mTVO3                  = null;
     private TextView mTVNO2                 = null;
     private TextView mTVSO2                 = null;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
         mTVCIA = (TextView)findViewById(R.id.tvCIA);
         mTVPM10 = (TextView)findViewById(R.id.tvPM10);
+        mTVPM25 = (TextView)findViewById(R.id.tvPM25);
         mTVO3 = (TextView)findViewById(R.id.tvO3);
         mTVNO2 = (TextView)findViewById(R.id.tvNO2);
         mTVSO2 = (TextView)findViewById(R.id.tvSO2);
@@ -231,48 +233,90 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+
+            String dateTime     = "";
+            String KHAI_Value   = "";
+            String KHAI_Grade   = "";
+            String pm10_Value   = "";
+            String pm10_Value24 = "";
+            String pm25_Value   = "";
+            String pm25_Value24 = "";
+            String O3_Value     = "";
+            String O3_Grade     = "";
+            String NO2_Value    = "";
+            String NO2_Grade    = "";
+            String SO2_Value    = "";
+            String SO2_Grade    = "";
+            int pm10Value_int   = -1;
+            String pm10_Grade   = "";
+            int pm25Value_int   = -1;
+            String pm25_Grade   = "";
+
             try{
                 JSONObject json = new JSONObject(response);
                 JSONArray jsonArr = json.getJSONArray("list");
                 if (jsonArr != null) {
                     JSONObject airInfoObj = jsonArr.getJSONObject(0);
 
-                    String dateTime     = airInfoObj.getString(StaticData.AIR_DATATIME_KEY);
+                    dateTime     = airInfoObj.getString(StaticData.AIR_DATATIME_KEY);
 
-                    String KHAI_Value   = airInfoObj.getString(StaticData.AIR_KHAI_VALUE_KEY);
-                    String KHAI_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_KHAI_GRADE_KEY));
+                    KHAI_Value   = airInfoObj.getString(StaticData.AIR_KHAI_VALUE_KEY);
+                    KHAI_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_KHAI_GRADE_KEY));
 
-                    String pm10_Value   = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
-                    String pm10_Value24 = airInfoObj.getString(StaticData.AIR_PM10_VALUE24_KEY);
-                    int pm10Value_int = Integer.parseInt(pm10_Value);
-                    String pm10_Grade   = StaticData.GetGradeString(pm10Value_int, StaticData.GRADE_TYPE_PM10);//getAirGrade(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
+                    pm10_Value   = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
+                    pm10_Value24 = airInfoObj.getString(StaticData.AIR_PM10_VALUE24_KEY);
 
-                    String pm25_Value   = airInfoObj.getString(StaticData.AIR_PM25_VALUE_KEY);
-                    String pm25_Value24 = airInfoObj.getString(StaticData.AIR_PM25_VALUE24_KEY);
-                    String pm25_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_PM25_GRADE_KEY));
+                    pm25_Value   = airInfoObj.getString(StaticData.AIR_PM25_VALUE_KEY);
+                    pm25_Value24 = airInfoObj.getString(StaticData.AIR_PM25_VALUE24_KEY);
 
-                    String O3_Value     = airInfoObj.getString(StaticData.AIR_O3_VALUE_KEY);
-                    String O3_Grade     = getAirGrade(airInfoObj.getString(StaticData.AIR_O3_GRADE_KEY));
+                    O3_Value     = airInfoObj.getString(StaticData.AIR_O3_VALUE_KEY);
+                    O3_Grade     = getAirGrade(airInfoObj.getString(StaticData.AIR_O3_GRADE_KEY));
 
-                    String NO2_Value    = airInfoObj.getString(StaticData.AIR_NO2_VALUE_KEY);
-                    String NO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_NO2_GRADE_KEY));
+                    NO2_Value    = airInfoObj.getString(StaticData.AIR_NO2_VALUE_KEY);
+                    NO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_NO2_GRADE_KEY));
 
-                    String SO2_Value    = airInfoObj.getString(StaticData.AIR_SO2_VALUE_KEY);
-                    String SO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_SO2_GRADE_KEY));
-
-                    String airInfo = "";
-                    airInfo += "측정시간 : " + dateTime + "\n";
-                    mTVAirInfo.setText(airInfo);
-
-                    mTVCIA.setText(KHAI_Value + " - " + KHAI_Grade);
-                    mTVPM10.setText(pm10_Value + "㎍/㎥(1H) - " + pm10_Grade);
-                    mTVO3.setText(O3_Value + " ppm - " + O3_Grade);
-                    mTVNO2.setText(NO2_Value + " ppm - " + NO2_Grade);
-                    mTVSO2.setText(SO2_Value + " ppm - " + SO2_Grade);
+                    SO2_Value    = airInfoObj.getString(StaticData.AIR_SO2_VALUE_KEY);
+                    SO2_Grade    = getAirGrade(airInfoObj.getString(StaticData.AIR_SO2_GRADE_KEY));
                 }
             }catch(JSONException e){
                 Log.e(StaticData.TAG, "Exception : " + e.toString());
             }
+
+            try{
+                pm10Value_int = Integer.parseInt(pm10_Value);
+                pm10_Grade   = StaticData.GetGradeString(pm10Value_int, StaticData.GRADE_TYPE_PM10);//getAirGrade(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
+            }catch(Exception e){
+                Log.e(StaticData.TAG, "Exception : " + e.toString());
+            }
+
+            try {
+                pm25Value_int = Integer.parseInt(pm25_Value);
+                pm25_Grade = StaticData.GetGradeString(pm25Value_int, StaticData.GRADE_TYPE_PM25);//getAirGrade(airInfoObj.getString(StaticData.AIR_PM25_GRADE_KEY));
+            }catch(Exception e){
+                Log.e(StaticData.TAG, "Exception : " + e.toString());
+            }
+
+            String airInfo = "";
+            airInfo += "측정시간 : " + dateTime + "\n";
+            mTVAirInfo.setText(airInfo);
+
+            mTVCIA.setText(KHAI_Value + " - " + KHAI_Grade);
+            if(pm10_Value != "-" && pm10_Grade.length() > 0){
+                mTVPM10.setText(pm10_Value + "㎍/㎥(1H) - " + pm10_Grade);
+            }
+            else{
+                mTVPM10.setText("-");
+            }
+
+            if(pm25_Value != "-" & pm25_Grade.length() > 0 ) {
+                mTVPM25.setText(pm25_Value + "㎍/㎥(1H) - " + pm25_Grade);
+            }
+            else{
+                mTVPM25.setText("-");
+            }
+            mTVO3.setText(O3_Value + " ppm - " + O3_Grade);
+            mTVNO2.setText(NO2_Value + " ppm - " + NO2_Grade);
+            mTVSO2.setText(SO2_Value + " ppm - " + SO2_Grade);
         }
 
         private String getAirGrade(String grade){

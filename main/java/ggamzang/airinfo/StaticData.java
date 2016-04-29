@@ -43,6 +43,7 @@ public class StaticData {
 
     final static String GRADE_TYPE_CAI      = "CAI";
     final static String GRADE_TYPE_PM10     = "PM10";
+    final static String GRADE_TYPE_PM25     = "PM25";
 
     // Naver Open API
     final static String CLIENT_ID           = "ziEvZm7GRAvbW4njDkcP";
@@ -79,6 +80,30 @@ public class StaticData {
                     grade = "나쁨";
                 }
                 else if(151 <= value)
+                {
+                    grade = "매우나쁨";
+                }
+                else
+                {
+                    grade = "-";
+                }
+                break;
+            }
+            case GRADE_TYPE_PM25:
+            {
+                if(0 <= value && value <= 15)
+                {
+                    grade = "좋음";
+                }
+                else if(16 <= value && value <= 50)
+                {
+                    grade = "보통";
+                }
+                else if(51 <= value && value <= 100)
+                {
+                    grade = "나쁨";
+                }
+                else if(101 <= value)
                 {
                     grade = "매우나쁨";
                 }
