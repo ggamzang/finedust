@@ -244,7 +244,8 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
 
                     String pm10_Value   = airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY);
                     String pm10_Value24 = airInfoObj.getString(StaticData.AIR_PM10_VALUE24_KEY);
-                    String pm10_Grade   = getAirGrade(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
+                    int pm10Value_int = Integer.parseInt(pm10_Value);
+                    String pm10_Grade   = StaticData.GetGradeString(pm10Value_int, StaticData.GRADE_TYPE_PM10);//getAirGrade(airInfoObj.getString(StaticData.AIR_PM10_GRADE_KEY));
 
                     String pm25_Value   = airInfoObj.getString(StaticData.AIR_PM25_VALUE_KEY);
                     String pm25_Value24 = airInfoObj.getString(StaticData.AIR_PM25_VALUE24_KEY);
@@ -264,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                     mTVAirInfo.setText(airInfo);
 
                     mTVCIA.setText(KHAI_Value + " - " + KHAI_Grade);
-                    mTVPM10.setText(pm10_Value + "㎍/㎥(1H)" + pm10_Value24);
+                    mTVPM10.setText(pm10_Value + "㎍/㎥(1H) - " + pm10_Grade);
                     mTVO3.setText(O3_Value + " ppm - " + O3_Grade);
                     mTVNO2.setText(NO2_Value + " ppm - " + NO2_Grade);
                     mTVSO2.setText(SO2_Value + " ppm - " + SO2_Grade);
