@@ -3,4 +3,5 @@
     <string name="settings">settings</string>
     <string name="pref_updateHour_default">1</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="info">일평균은 당일 00시부터 현재시간까지의 측정자료에 대한 평균값입니다. 실시간 관측된 자료이며 현지사정이나 수신 상태에 의해 차이가 발생할 수 있습니다.\n제공 : 한국환경공단</string>
 </resources>

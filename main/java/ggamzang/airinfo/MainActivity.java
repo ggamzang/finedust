@@ -6,6 +6,7 @@ package ggamzang.airinfo;
         :   상태 안좋아졌을때 알림 추가( 좋음 > 보통 > 나쁨 > 매우나쁨 )
         :   미세먼지 예보
         :   미세먼지 history graph 추가
+        :   먼지 상태 변경되면, 알림
 */
 import android.app.AlarmManager;
 import android.app.PendingIntent;

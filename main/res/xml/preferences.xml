@@ -13,4 +13,21 @@
         android:entries="@array/pref_updateHour_entries"
         android:entryValues="@array/pref_updateHour_values"
         android:defaultValue="@string/pref_updateHour_default" />
+    <CheckBoxPreference
+        android:key="pref_sleepModeUse"
+        android:title="절전 모드"
+        android:defaultValue="false">
+    </CheckBoxPreference>
+    <ggamzang.airinfo.TimePickerPreference
+        android:dependency="pref_sleepModeUse"
+        android:key="pref_sleepModeStartTime"
+        android:title="절전 시작 시간"
+        android:defaultValue="00:00">
+    </ggamzang.airinfo.TimePickerPreference>
+    <ggamzang.airinfo.TimePickerPreference
+        android:dependency="pref_sleepModeUse"
+        android:key="pref_sleepModeEndTime"
+        android:title="절전 종료 시간"
+        android:defaultValue="00:00">
+    </ggamzang.airinfo.TimePickerPreference>
 </PreferenceScreen>
