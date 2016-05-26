@@ -8,37 +8,31 @@ package ggamzang.airinfo;
         :   미세먼지 history graph 추가
         :   먼지 상태 변경되면, 알림
 */
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-//import android.widget.Toolbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import android.support.v7.widget.Toolbar;
+import java.util.ArrayList;
 
-import java.text.NumberFormat;
+//import android.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity implements AirInfoSharedPreferenceChangeListener{
     private TextView mTVSelected            = null;
@@ -49,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
     private TextView mTVO3                  = null;
     private TextView mTVNO2                 = null;
     private TextView mTVSO2                 = null;
+    private TextView mTVCity                = null;
 
     private LinearLayout mLLMain            = null;
     private TextView mTVGuide                = null;
@@ -81,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         mTVNO2 = (TextView)findViewById(R.id.tvNO2);
         mTVSO2 = (TextView)findViewById(R.id.tvSO2);
 
+        mTVCity = (TextView)findViewById(R.id.tvCity);
+
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(mTVSelected != null){
@@ -106,6 +103,15 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
                 mIVColor.setImageDrawable(drb);
             }
         });*/
+
+        DustForecastTask foreCastTask = new DustForecastTask();
+        if(foreCastTask != null){
+            foreCastTask.execute();
+        }
+        AllCityDustInfoTask allCityTask = new AllCityDustInfoTask();
+        if(allCityTask != null){
+            allCityTask.execute();
+        }
         AirInfoEventManager.getInstance().addPreferenceListener(this);
     }
 
@@ -218,6 +224,83 @@ public class MainActivity extends AppCompatActivity implements AirInfoSharedPref
         else if(SettingsActivity.KEY_PREF_UPDATE_HOUR.equals(key)){
             Log.e(StaticData.TAG, "value:"+value);
             RestartAlarm(value);
+        }
+    }
+
+    public class DustForecastTask extends AsyncTask<String, Integer, Boolean>{
+        String response;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Log.d(StaticData.TAG, "DustForecast requst");
+            AirInfoAPIClient mAirClient = new AirInfoAPIClient();
+            response = mAirClient.getDustForecast();
+            return null;
+        }
+    }
+
+    public class AllCityDustInfoTask extends AsyncTask<String, Integer, Boolean>{
+        String response = "";
+        ArrayList<Integer> pm10Average = new ArrayList();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            String text = "";
+            int index = 0;
+            for(String city : StaticData.CITY_LIST){
+                text += city + " : ";
+                text += pm10Average.get(index++) + "   ";
+            }
+            mTVCity.setText(text);
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Log.d(StaticData.TAG, "AllCityDustInfoTask requst");
+            AirInfoAPIClient mAirClient = new AirInfoAPIClient();
+            for(String city : StaticData.CITY_LIST){
+                response = mAirClient.getDustOfCity(city);
+                try {
+                    JSONObject json = new JSONObject(response);
+                    JSONArray jsonArr = json.getJSONArray("list");
+                    if (jsonArr != null) {
+                        int cityCnt = 0;
+                        int pm10 = 0;
+                        for(int i = 0; i < jsonArr.length(); i++) {
+                            JSONObject airInfoObj = jsonArr.getJSONObject(i);
+                            if(airInfoObj.getString("mangName").compareTo("도시대기") == 0){
+                                if(airInfoObj.getString(StaticData.AIR_PM10_VALUE_KEY).compareTo("-") == 0){
+                                    continue;
+                                }
+                                else{
+                                    pm10 += airInfoObj.getInt(StaticData.AIR_PM10_VALUE_KEY);
+                                    cityCnt++;
+                                }
+                            }else{
+                                Log.d(StaticData.TAG, "mangName["+ i + "]" +airInfoObj.getString("mangName"));
+                            }
+                        }
+                        pm10Average.add(pm10 / cityCnt);
+                    }
+                }catch(JSONException e){
+                    Log.e(StaticData.TAG, "Exception : " + e.toString());
+                }
+            }
+            return null;
         }
     }
 

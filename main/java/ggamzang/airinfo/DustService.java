@@ -82,11 +82,13 @@ public class DustService extends Service {
                                 Log.e(StaticData.TAG, "unexpected grade:" + grade);*/
                         }
                     }catch(JSONException e){
-                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
+//                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
                         Log.e(StaticData.TAG, e.toString());
+                        return;
                     }catch(NumberFormatException e){
-                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
+//                        imageID = StaticData.getGradeImage(-1, StaticData.GRADE_TYPE_PM10);
                         Log.e(StaticData.TAG, e.toString());
+                        return;
                     }
 
                     Intent intent = new Intent(DustService.this, MainActivity.class);

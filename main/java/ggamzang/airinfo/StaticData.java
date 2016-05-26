@@ -2,6 +2,8 @@ package ggamzang.airinfo;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+
 /**
  * Created by user on 2016-01-05.
  */
@@ -44,6 +46,8 @@ public class StaticData {
     final static String GRADE_TYPE_CAI      = "CAI";
     final static String GRADE_TYPE_PM10     = "PM10";
     final static String GRADE_TYPE_PM25     = "PM25";
+
+    final static String CITY_LIST[] = {"서울", "부산", "대구", "인천", "광주", "대전", "울산", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"};
 
     // Naver Open API
     final static String CLIENT_ID           = "ziEvZm7GRAvbW4njDkcP";
